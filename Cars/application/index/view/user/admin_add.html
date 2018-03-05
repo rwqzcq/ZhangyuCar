@@ -1,0 +1,161 @@
+{extend name='public/base'/}
+{block name='header'}{/block} {//关掉头部}
+{block name='menu'}{/block} {//关掉菜单}
+{block name='seo'}
+<title>{$title|default="标题"}</title>
+<meta name="keywords" content="{$keywords|default='关键字'}">
+<meta name="description" content="{$desc|default='描述'}">
+{/block}
+
+{block name='content'}
+<article class="cl pd-20">
+    <form class="form form-horizontal" id="form-admin-add">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>用户名：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input  type="text" class="input-text" value="" placeholder="" id="name" name="name">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>用户密码：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="password" class="input-text" autocomplete="off" value=""  placeholder="密码为6位" id="password" name="password">
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3">启用状态：</label>
+            <div class="formControls col-xs-8 col-sm-9"> <span class="select-box" style="width:150px;">
+				<select class="select" name="status" size="1">
+					<option value="1" selected>启用</option>
+                    <option value="0">不启用</option>
+				</select>
+				</span>
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>邮箱：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="email" class="input-text" placeholder="@" name="email" id="email" value="">
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3">角色：</label>
+            <div class="formControls col-xs-8 col-sm-9"> <span class="select-box" style="width:150px;">
+				<select class="select" name="role" size="1">
+                    <option value="-1" selected></option>
+                    <option value="1">交管中队</option>
+                    <option value="2" >停车场人员</option>
+				</select>
+                </span>                
+            </div>
+        </div>
+
+        <div class="row cl submit_flag">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <input class="btn btn-primary radius disabled" type="button" value="&nbsp;&nbsp;提交&nbsp;&nbsp;" id="submit" >
+            </div>
+        </div>
+    </form>
+</article>
+{/block}
+
+{block name='js'}
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="__STATIC__/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="__STATIC__/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="__STATIC__/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script>
+    $(function(){
+        //防止用户无更新提交,只有表中数据有变化时才允许提交
+        $("form").children().change(function(){
+            $("#submit").removeClass('disabled');
+        });
+
+        //失去焦点时,检查用户名是否重复
+        $("#name").blur(function(){
+            $.ajax({
+                type: 'GET',
+                url: "checkUserName",
+               data:{name:$(this).val()},
+                dataType: 'json',
+                success: function(data){
+                    if (data.status == 1) {
+                       alert(data.message);
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            });
+        });
+
+        //失去焦点时,检查邮箱是否重复
+        $("#email").blur(function(){
+            $.ajax({
+                type: 'GET',
+                url: "checkUserEmail",
+                data:{email:$(this).val()},
+                dataType: 'json',
+                success: function(data){
+                    if (data.status == 1) {
+                        alert(data.message);
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            });
+        });
+        $('select[name=role]').bind('change', function(){
+            value = $(this).val();
+            function select(url) {
+                return $.getJSON(url, function(data){
+                    createDom(data);
+                });
+            }
+            function createDom($json){
+                $html = '<div class="row cl new_append">' + 
+                            '<label class="form-label col-xs-4 col-sm-3">归属：</label>' + 
+                            '<div class="formControls col-xs-8 col-sm-9"> <span class="select-box" style="width:150px;">' + 
+				                '<select class="select" name="'+name+'" size="1">';			
+
+                $.each($json, function(index, value){
+                    $html += '<option value="'+value.id+'" >'+value.name+'</option>';
+                });
+                $html +=  '</select></span></div></div>';
+                $('.new_append').remove();// 删除自己和子元素
+                $('.submit_flag').before($html);
+            }
+            if(value !== -1) {
+                // 发送ajax请求
+                url = "{:url('getList')}";
+                url += value == 1 ? '?type=1' : '?type=2';
+                name = value == 1 ? 'squadron' : 'parking';
+                select(url);
+            }
+        });
+        /**
+         * 添加操作
+         */ 
+        $("#submit").on("click", function(event){
+            $.ajax({
+                type: "POST",
+                url: "{:url('user/addUser')}",
+                data: $("#form-admin-add").serialize(),
+                dataType: "json",
+                success: function(data){
+                    if (data.status == 1) {
+                        alert(data.message);
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            });
+        })
+    })
+</script>
+{/block}
+
+</body>
+</html>

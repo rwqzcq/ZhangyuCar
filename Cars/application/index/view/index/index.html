@@ -1,0 +1,84 @@
+﻿{extend name="public/base" /}
+
+{block name="seo"}
+<title>{$title|default='页面标题'}</title>
+<meta name="keywords" content="{$keywords|default='页面关键字'}">
+<meta name="description" content="{$desc|default='页面描述'}">
+{/block}
+
+{include file="public/header" /}
+
+{include file="public/menu" /}
+
+{block name='content'}
+<section class="Hui-article-box">
+	<nav class="breadcrumb"><i class="Hui-iconfont"></i> <a href="/" class="maincolor">首页</a>
+		<span class="c-999 en">&gt;</span>
+		<span class="c-666">运行环境</span>
+		<a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+	<div class="Hui-article">
+		<article class="cl pd-20">
+			<p class="f-20 text-success">公安行政暂扣车辆管理系统</p>
+			<p>登录次数：{$Think.session.user_info.login_count}</p>
+			<p>上次登录IP：{$Request.ip}  上次登录时间：{:date("Y-m-d H:i:s", $Think.session.user_info.login_time)}</p>
+
+			<table class="table table-border table-bordered table-bg mt-20">
+				<thead>
+					<tr>
+						<th colspan="2" scope="col">服务器信息</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th width="30%">服务器计算机名</th>
+						<td><span id="lbServerName">{$Request.host}</span></td>
+					</tr>
+					<tr>
+						<td>服务器IP地址</td>
+						<td>{$Request.ip}</td>
+					</tr>
+					<tr>
+						<td>服务器域名</td>
+						<!--PHP语句:<?php echo \think\Request::instance()->domain(); ?>-->
+						<td>{$Request.domain}</td>
+					</tr>
+					<tr>
+						<td>当前PHP版本 </td>
+						<td>{$Think.const.PHP_VERSION}</td>
+					</tr>
+
+					<tr>
+						<td>服务器版本 </td>
+						<td>{$Think.const.PHP_OS}</td>
+					</tr>
+					<tr>
+						<td>当前请求URL</td>
+						<!--传入参数true,显示包括域名的完整绝对URL请求地址-->
+						<!--PHP语句:<?php echo \think\Request::instance()->url(true); ?>-->
+						<td>{$Request.url.true}</td>
+					</tr>
+
+					<tr>
+						<td>当前Session数量 </td>
+						<!--这里用原生$_SESSION,TP5无对应方法-->
+						<td>{:count($_SESSION)}</td>
+			</tr>
+					<tr>
+						<td>当前SessionID </td>
+						<!--执行原生session_id()方法,因为tp5无对应请求方法-->
+						<td>{:session_id()}</td>
+			</tr>
+
+		</tbody>
+	</table>
+</article>
+		<footer class="footer">
+			<p>PHP中文网ThinkPHP5实战系列课程<br> 本后台系统由<a href="http://www.h-ui.net/" target="_blank" title="H-ui前端框架">H-ui前端框架</a>提供前端技术支持</p>
+</footer>
+</div>
+</section>
+{/block}
+
+{block name="js"}{/block}
+</body>
+</html>
